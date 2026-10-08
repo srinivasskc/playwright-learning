@@ -30,3 +30,13 @@ test("Practice of Locator Methods with Options", async({page}) =>{
     await page.locator(".inventory_item_name",{hasNotText:/Sauce.*/}).click()
     await page.locator(".inventory_details_name",{hasText:/Test.*/})
 })
+
+test("Practice of GetByLabel Methods", async({page}) => {
+    await page.goto("https://qa-practice.razvanvancea.ro/auth_ecommerce.html")
+    await page.getByLabel("Email", {exact: true}).fill("admin@admin.com")
+})
+
+test("Practice for GetBy Placeholder", async({page}) => {
+    await page.goto("https://rahulshettyacademy.com/seleniumPractise/#/")
+    await page.getByPlaceholder("Search for Vegetables and Fruits", {exact: true}).fill("Carrot")
+})
