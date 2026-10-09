@@ -41,6 +41,33 @@ test("Practice for GetBy Placeholder", async({page}) => {
     await page.getByPlaceholder("Search for Vegetables and Fruits", {exact: true}).fill("Carrot")
 })
 
+test("Practice for getByText", async({page}) => {
+    await page.goto("https://qa-practice.razvanvancea.ro/auth_ecommerce.html")
+    console.log(await page.getByText('Login - Sh').textContent())
+   //console.log(await page.getByText('Login - Sh', {exact: true}).textContent())
+})
+
+
+test("Practice for getAltText", async({page}) => {
+    await page.goto("https://www.saucedemo.com/")
+    await page.locator("#user-name").fill("standard_user")
+    await page.locator("#password").fill("secret_sauce")
+    await page.locator("#login-button").click()
+    await page.getByAltText("Sauce Labs Backpack").click()
+    console.log(await page.getByText("Sauce Labs Backpack",{exact:true}).textContent())
+
+})
+
+
+test("Practice for getByTitle", async({page}) => {
+    await page.goto("https://automationbookstore.dev/")
+    await page.getByPlaceholder("Filter books..").fill("est")
+    await page.getByTitle("Clear text").click()
+    await page.getByPlaceholder("Filter books..").fill("est")
+    await page.getByTitle("Clear text").last().click()
+})
+
+
 // Practice - rahulshettyacademy
 
 test("Login Page Practice", async({page}) => {
