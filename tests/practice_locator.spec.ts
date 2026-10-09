@@ -40,3 +40,11 @@ test("Practice for GetBy Placeholder", async({page}) => {
     await page.goto("https://rahulshettyacademy.com/seleniumPractise/#/")
     await page.getByPlaceholder("Search for Vegetables and Fruits", {exact: true}).fill("Carrot")
 })
+
+// Practice - rahulshettyacademy
+
+test("Login Page Practice", async({page}) => {
+    await page.goto("https://rahulshettyacademy.com/loginpagePractise/")
+    await page.getByLabel("Username:",{exact:true}).fill("rahulshettyacademy")
+    await page.getByLabel("Password:",{exact:true}).fill("Learning@830$3mK2")
+})
