@@ -6,7 +6,7 @@ import {test, expect} from "playwright/test"
 
 
 // Auto Retry Assertions: https://playwright.dev/docs/test-assertions#auto-retrying-assertions
-test("Assertion 'to have count' - check specific no of elements present on the page ", async({page}) => {
+test.only("Assertion 'to have count' - check specific no of elements present on the page ", async({page}) => {
     await page.goto("https://www.saucedemo.com/")
     await page.getByTestId('username').fill("standard_user")
     await page.getByTestId('password').fill("secret_sauce")
@@ -130,6 +130,8 @@ test("Assertion with custom error message", async({page}) => {
 
 // Soft Assertions: Soft assertions allow the test to continue executing even if an assertion fails. 
 // This can be useful when you want to check multiple conditions in a single test without stopping at the first failure.
+// https://playwright.dev/docs/test-assertions#soft-assertions
+// Note that soft assertions only work with Playwright test runner.
 
 test("Soft Assertion Example", async({page}) => {
     await page.goto("https://www.saucedemo.com/")
