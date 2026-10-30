@@ -55,6 +55,7 @@ test("Practice for getByText", async({page}) => {
 
 // This is recommended for elements supports the alt attribute like img, area, input[type=image], etc.
 test("Practice for getByAltText", async({page}) => {
+    //test.slow()
     await page.goto("https://www.saucedemo.com/")
     await page.locator("#user-name").fill("standard_user")
     await page.locator("#password").fill("secret_sauce")
