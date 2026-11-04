@@ -3,18 +3,19 @@ import { defineConfig, devices } from '@playwright/test';
 export default defineConfig({
   testDir: './tests',
   /* Run tests in files in parallel */
-  
-  fullyParallel: true,
+
+  // Changed to false to run tests in sequence, one after another - for Hooks Practice.
+  fullyParallel: false,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
-  
+
   forbidOnly: !!process.env.CI,
   /* Retry on CI only */
   retries: process.env.CI ? 2 : 0,
   /* Opt out of parallel tests on CI. */
   workers: process.env.CI ? 1 : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  
-  reporter: [['html',{open:'always'}]],
+
+  reporter: [['html', { open: 'always' }]],
 
   //timeout: 5 * 60 * 1000, 
   //5 minutes.
@@ -28,8 +29,8 @@ export default defineConfig({
     /* Base URL to use in actions like `await page.goto('')`. */
     // baseURL: 'http://localhost:3000',
 
-    actionTimeout: 10_0000, // 10 seconds
-    
+    actionTimeout: 10_000, // 10 seconds
+
     headless: false,
 
     // Screenshot and video settings
@@ -39,26 +40,35 @@ export default defineConfig({
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
 
-    //Customize the testIdAttribute to use for getByTestId queries. The default is 'data-testid'.
-    testIdAttribute: 'data-test',
+    // testIdAttribute accepts a single value, so it is set per project below.
   },
 
   /* Configure projects for major browsers */
   projects: [
     {
+      // Default: saucedemo and most tests use data-test.
+      // Skips the qatestacademy test, which runs in the project below.
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      grepInvert: /Chaining Locators/,
+      use: { ...devices['Desktop Chrome'], testIdAttribute: 'data-test' },
+    },
+    {
+      // demo.qatestacademy.com uses data-testid.
+      name: 'qatestacademy',
+      testMatch: /(chaining|filtering)\.spec\.ts/,
+      grep: /Chaining Locators/,
+      use: { ...devices['Desktop Chrome'], testIdAttribute: 'data-testid' },
     },
 
-    {
-      name: 'firefox',
-      use: { ...devices['Desktop Firefox'] },
-    },
+    // {
+    //   name: 'firefox',
+    //   use: { ...devices['Desktop Firefox'] },
+    // },
 
-    {
-      name: 'webkit',
-      use: { ...devices['Desktop Safari'] },
-    },
+    // {
+    //   name: 'webkit',
+    //   use: { ...devices['Desktop Safari'] },
+    // },
 
     /* Test against mobile viewports. */
     // {
