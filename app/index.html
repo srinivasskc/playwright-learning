@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TaskFlow</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: system-ui, sans-serif; background: #f4f5f7; color: #1f2937; }
+  header { display: flex; justify-content: space-between; align-items: center; padding: 12px 24px; background: #fff; border-bottom: 1px solid #e5e7eb; }
+  header h1 { font-size: 20px; margin: 0; }
+  .header-right { display: flex; align-items: center; gap: 16px; }
+  button { cursor: pointer; font: inherit; }
+  .btn-primary { background: #2563eb; color: #fff; border: 0; padding: 8px 16px; border-radius: 6px; }
+  .btn-primary:hover { background: #1d4ed8; }
+  .avatar { width: 36px; height: 36px; border-radius: 50%; background: #7c3aed; color: #fff; display: grid; place-items: center; font-weight: 600; }
+  .layout { display: grid; grid-template-columns: 220px 1fr; gap: 24px; max-width: 960px; margin: 24px auto; padding: 0 16px; }
+  aside { background: #fff; border-radius: 8px; padding: 16px; align-self: start; border: 1px solid #e5e7eb; }
+  aside h2 { font-size: 14px; margin: 0 0 8px; color: #6b7280; text-transform: uppercase; }
+  aside .count { font-size: 32px; font-weight: 700; }
+  .filter-bar { display: flex; gap: 8px; margin-bottom: 16px; }
+  .tab { background: #fff; border: 1px solid #d1d5db; padding: 6px 16px; border-radius: 999px; }
+  .tab[aria-selected="true"] { background: #1f2937; color: #fff; border-color: #1f2937; }
+  .task-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+  .task-card { display: grid; grid-template-columns: 1fr auto auto; gap: 8px 16px; align-items: center; background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 14px 16px; }
+  .task-title { font-weight: 600; }
+  .task-card.done .task-title { text-decoration: line-through; color: #9ca3af; }
+  .assignee { grid-column: 1; font-size: 13px; color: #6b7280; }
+  .badge { font-size: 12px; padding: 2px 10px; border-radius: 999px; font-weight: 600; }
+  .badge.high { background: #fee2e2; color: #b91c1c; }
+  .badge.medium { background: #fef3c7; color: #b45309; }
+  .badge.low { background: #dcfce7; color: #15803d; }
+  .btn-complete { background: #fff; border: 1px solid #16a34a; color: #16a34a; padding: 6px 12px; border-radius: 6px; }
+  .btn-complete:hover:not(:disabled) { background: #16a34a; color: #fff; }
+  .btn-complete:disabled { border-color: #d1d5db; color: #9ca3af; cursor: default; }
+  .empty { text-align: center; color: #6b7280; padding: 32px; }
+  dialog { border: 0; border-radius: 10px; padding: 24px; width: 360px; box-shadow: 0 10px 40px rgba(0,0,0,.25); }
+  dialog::backdrop { background: rgba(0,0,0,.4); }
+  dialog h2 { margin-top: 0; }
+  label { display: block; font-size: 14px; margin-bottom: 12px; }
+  input, select { display: block; width: 100%; margin-top: 4px; padding: 8px; border: 1px solid #d1d5db; border-radius: 6px; font: inherit; }
+  .dialog-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
+  .btn-secondary { background: #fff; border: 1px solid #d1d5db; padding: 8px 16px; border-radius: 6px; }
+  @media (max-width: 640px) { .layout { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<header data-testid="header">
+  <h1>TaskFlow</h1>
+  <div class="header-right">
+    <button class="btn-primary" id="new-task-btn">New Task</button>
+    <div class="avatar" role="img" aria-label="User avatar" data-testid="user-avatar">SK</div>
+  </div>
+</header>
+
+<div class="layout">
+  <aside data-testid="sidebar" aria-label="Sidebar">
+    <h2>Srinivas's tasks</h2>
+    <div class="count" data-testid="task-count" aria-live="polite">0</div>
+  </aside>
+
+  <main>
+    <div class="filter-bar" role="tablist" aria-label="Task filters" data-testid="filter-bar">
+      <button class="tab" role="tab" data-filter="all" aria-selected="true">All</button>
+      <button class="tab" role="tab" data-filter="in-progress" aria-selected="false">In Progress</button>
+      <button class="tab" role="tab" data-filter="done" aria-selected="false">Done</button>
+    </div>
+    <ul class="task-list" data-testid="task-list" aria-label="Tasks"></ul>
+  </main>
+</div>
+
+<dialog id="task-dialog" aria-labelledby="dialog-title">
+  <form method="dialog" id="task-form">
+    <h2 id="dialog-title">New Task</h2>
+    <label>Title <input name="title" required></label>
+    <label>Assignee <input name="assignee" value="Srinivas" required></label>
+    <label>Priority
+      <select name="priority">
+        <option value="high">High</option>
+        <option value="medium" selected>Medium</option>
+        <option value="low">Low</option>
+      </select>
+    </label>
+    <div class="dialog-actions">
+      <button type="button" class="btn-secondary" id="cancel-btn">Cancel</button>
+      <button type="submit" class="btn-primary">Create</button>
+    </div>
+  </form>
+</dialog>
+
+<script>
+  const CURRENT_USER = 'Srinivas';
+  let nextId = 5;
+  let filter = 'all';
+  const tasks = [
+    { id: 1, title: 'Write login tests',      priority: 'high',   assignee: 'Srinivas', status: 'in-progress' },
+    { id: 2, title: 'Review pull request',    priority: 'medium', assignee: 'Alex',     status: 'in-progress' },
+    { id: 3, title: 'Update documentation',   priority: 'low',    assignee: 'Srinivas', status: 'done' },
+    { id: 4, title: 'Fix flaky checkout test', priority: 'high',   assignee: 'Priya',    status: 'in-progress' },
+  ];
+
+  const list = document.querySelector('[data-testid="task-list"]');
+  const countEl = document.querySelector('[data-testid="task-count"]');
+  const dialog = document.getElementById('task-dialog');
+  const form = document.getElementById('task-form');
+  const cap = s => s[0].toUpperCase() + s.slice(1);
+
+  function render() {
+    const visible = tasks.filter(t => filter === 'all' || t.status === filter);
+    list.innerHTML = '';
+    if (!visible.length) {
+      list.innerHTML = '<li class="empty" data-testid="empty-state">No tasks found</li>';
+    }
+    for (const t of visible) {
+      const li = document.createElement('li');
+      li.className = 'task-card' + (t.status === 'done' ? ' done' : '');
+      li.dataset.testid = 'task-card';
+      li.innerHTML = `
+        <span class="task-title" data-testid="task-title"></span>
+        <span class="badge ${t.priority}" data-testid="priority-badge">${cap(t.priority)}</span>
+        <button class="btn-complete" ${t.status === 'done' ? 'disabled' : ''}>${t.status === 'done' ? 'Completed' : 'Complete'}</button>
+        <span class="assignee" data-testid="assignee"></span>`;
+      li.querySelector('.task-title').textContent = t.title;
+      li.querySelector('.assignee').textContent = t.assignee;
+      li.querySelector('.btn-complete').addEventListener('click', () => { t.status = 'done'; render(); });
+      list.appendChild(li);
+    }
+    countEl.textContent = tasks.filter(t => t.assignee === CURRENT_USER && t.status !== 'done').length;
+    document.querySelectorAll('.tab').forEach(b => b.setAttribute('aria-selected', b.dataset.filter === filter));
+  }
+
+  document.querySelectorAll('.tab').forEach(b => b.addEventListener('click', () => { filter = b.dataset.filter; render(); }));
+  document.getElementById('new-task-btn').addEventListener('click', () => { form.reset(); dialog.showModal(); });
+  document.getElementById('cancel-btn').addEventListener('click', () => dialog.close());
+  form.addEventListener('submit', () => {
+    const d = new FormData(form);
+    tasks.push({ id: nextId++, title: d.get('title').trim(), priority: d.get('priority'), assignee: d.get('assignee').trim(), status: 'in-progress' });
+    render();
+  });
+
+  render();
+</script>
+</body>
+</html>
