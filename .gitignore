@@ -1,4 +1,3 @@
-
 # Playwright
 node_modules/
 /test-results/
@@ -6,4 +5,19 @@ node_modules/
 /blob-report/
 /playwright/.cache/
 /playwright/.auth/
-.github/
+
+# Environment (keep the example file)
+.env
+.env.*
+!.env.example
+
+# Tooling caches and logs
+.eslintcache
+*.tsbuildinfo
+*.log
+
+# OS / editor
+.DS_Store
+
+# Claude Code
+.claude
