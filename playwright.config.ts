@@ -33,7 +33,7 @@ export default defineConfig({
 
     actionTimeout: 10_000, // 10 seconds
 
-    headless: false,
+    headless: true,
 
     // Screenshot and video settings
     screenshot: 'only-on-failure',

@@ -85,3 +85,25 @@ test("Practice test 12", async ({ page, browserName }) => {
     console.log("Starting Practice Test 12")
     console.log("Ending Practice Test 12")
 })
+
+
+test.describe("Login Page", async() => {
+    test.beforeEach(async({page})=>{
+        await page.goto("https://www.saucedemo.com/")
+    })
+
+    test("Shows the login form", async({page})=>{
+        await expect(page.getByRole("form", {name:"Login"})).toBeVisible()
+    })
+
+    test("requires username", async({page})=>{
+        page.getByRole("button", {name: "Login"}).click()
+        await expect(page.getByRole("alert")).toContainText("Username is required")
+    })
+
+    test("skip the feature", async({page, browserName})=> {
+        test.skip(browserName=="chromium","Skip Chromium Browser");
+        await page.goto("https://demo.playwright.dev/todomvc");
+    })
+
+})
