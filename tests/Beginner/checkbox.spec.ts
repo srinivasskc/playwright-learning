@@ -124,5 +124,5 @@ test("Multi Checkbox - check & uncheck with For-IF condition", async ({ page }) 
     await expect(chromeCheckbox).not.toBeChecked()
     await expect(firefoxCheckbox).not.toBeChecked()
     await expect(safariCheckbox).not.toBeChecked()
-
+    
 })
