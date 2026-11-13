@@ -58,3 +58,13 @@ test("Native Dropdowns - Index Number for Specific Item", async ({ page }) => {
     const htmlSelect = page.getByRole("combobox", { name: "HTML select" })
     await htmlSelect.selectOption({index:1})
 })
+
+test("Handle Grouped dropdown", async({page}) => {
+    await page.goto("https://www.fundootesters.com/TestersPlayground/dropdowns")
+    await expect(page.getByLabel("Grouped dropdown")).toBeVisible()
+
+    const groupedDropdown = await page.getByRole("combobox", {name: "Grouped dropdown"})
+    await groupedDropdown.selectOption("Selenium")
+    await groupedDropdown.selectOption({value: "detox"})
+    await groupedDropdown.selectOption({label: "Appium"})
+})

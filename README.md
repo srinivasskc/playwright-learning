@@ -1,6 +1,6 @@
 # playwright-learning
 
-A Playwright + TypeScript learning project covering locators, assertions, chaining, filtering, hooks and test annotations.
+A Playwright + TypeScript learning project covering locators, assertions, chaining, filtering, hooks, test annotations, click actions, form controls (checkboxes, radio buttons, dropdowns, multi-select and async dropdowns) and JavaScript alert handling.
 
 ## Prerequisites
 
@@ -47,7 +47,9 @@ Environment variables (loaded via `dotenv` in `playwright.config.ts`):
 ```
 app/                     Local practice page (index.html)
 src/data/                Test data (e.g. users.json)
-tests/                   Spec files
+tests/Beginner/          Locators, assertions, hooks, annotations, checkbox, radio,
+                         dropdown (single, multi-select, async), authentication
+tests/Intermediate/      Click actions, elements, filtering, JS alerts
 playwright.config.ts     Playwright configuration
 tsconfig.json            TypeScript config with path aliases
 .github/workflows/       CI workflow
